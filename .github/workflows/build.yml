@@ -132,16 +132,18 @@ jobs:
           mkdir -p package/lib
           mkdir -p package/bin
 
-          cp -r $INSTALL_DIR/include/* package/include/ || true
+          if [ -d "$INSTALL_DIR/include" ]; then
+            cp -r "$INSTALL_DIR/include/." package/include/
+          fi
 
-          find $INSTALL_DIR -type f \( \
+          find "$INSTALL_DIR" -type f \( \
             -name "*.lib" -o \
             -name "*.a" -o \
             -name "*.so" -o \
             -name "*.dylib" \) \
             -exec cp {} package/lib/ \;
 
-          find $INSTALL_DIR -type f -name "*.dll" \
+          find "$INSTALL_DIR" -type f -name "*.dll" \
             -exec cp {} package/bin/ \;
 
       - name: Upload artifact
