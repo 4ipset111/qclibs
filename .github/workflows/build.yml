@@ -1,0 +1,172 @@
+name: Build Dependencies
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+      - master
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+          - ubuntu-latest
+          - windows-latest
+          - macos-latest
+
+    runs-on: ${{ matrix.os }}
+
+    env:
+      BUILD_TYPE: Release
+      INSTALL_DIR: ${{ github.workspace }}/deps-install
+
+      ASSIMP_VERSION: v6.0.5
+      FREETYPE_VERSION: VER-2-14-3
+      GLEW_VERSION: glew-2.3.1
+      SDL3_VERSION: release-3.4.8
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Linux dependencies
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt update
+
+          sudo apt install -y \
+            build-essential \
+            ninja-build \
+            cmake \
+            pkg-config \
+            libx11-dev \
+            libxext-dev \
+            libxrandr-dev \
+            libxcursor-dev \
+            libxi-dev \
+            libxfixes-dev \
+            libwayland-dev \
+            libxkbcommon-dev \
+            libasound2-dev \
+            libpulse-dev \
+            libgl1-mesa-dev
+
+      - name: Setup MSVC
+        if: runner.os == 'Windows'
+        uses: ilammy/msvc-dev-cmd@v1
+
+      - name: Create directories
+        shell: bash
+        run: |
+          mkdir -p build
+          mkdir -p $INSTALL_DIR
+
+      - name: Clone assimp
+        shell: bash
+        run: |
+          git clone \
+            --branch $ASSIMP_VERSION \
+            --depth 1 \
+            https://github.com/assimp/assimp.git
+
+      - name: Build assimp
+        shell: bash
+        run: |
+          cmake -S assimp -B build/assimp \
+            -DCMAKE_BUILD_TYPE=$BUILD_TYPE \
+            -DCMAKE_INSTALL_PREFIX=$INSTALL_DIR \
+            -DASSIMP_BUILD_TESTS=OFF \
+            -DASSIMP_BUILD_ASSIMP_TOOLS=OFF \
+            -DBUILD_SHARED_LIBS=ON
+
+          cmake --build build/assimp --config $BUILD_TYPE --parallel
+          cmake --install build/assimp --config $BUILD_TYPE
+
+      - name: Clone freetype
+        shell: bash
+        run: |
+          git clone \
+            --branch $FREETYPE_VERSION \
+            --depth 1 \
+            https://github.com/freetype/freetype.git
+
+      - name: Build freetype
+        shell: bash
+        run: |
+          cmake -S freetype -B build/freetype \
+            -DCMAKE_BUILD_TYPE=$BUILD_TYPE \
+            -DCMAKE_INSTALL_PREFIX=$INSTALL_DIR \
+            -DBUILD_SHARED_LIBS=ON
+
+          cmake --build build/freetype --config $BUILD_TYPE --parallel
+          cmake --install build/freetype --config $BUILD_TYPE
+
+      - name: Clone GLEW
+        shell: bash
+        run: |
+          git clone \
+            --branch $GLEW_VERSION \
+            --depth 1 \
+            https://github.com/nigels-com/glew.git
+
+      - name: Build GLEW
+        shell: bash
+        run: |
+          cmake -S glew/build/cmake -B build/glew \
+            -DCMAKE_BUILD_TYPE=$BUILD_TYPE \
+            -DCMAKE_INSTALL_PREFIX=$INSTALL_DIR \
+            -DBUILD_SHARED_LIBS=ON
+
+          cmake --build build/glew --config $BUILD_TYPE --parallel
+          cmake --install build/glew --config $BUILD_TYPE
+
+      - name: Clone SDL3
+        shell: bash
+        run: |
+          git clone \
+            --branch $SDL3_VERSION \
+            --depth 1 \
+            https://github.com/libsdl-org/SDL.git SDL3
+
+      - name: Build SDL3
+        shell: bash
+        run: |
+          cmake -S SDL3 -B build/SDL3 \
+            -DCMAKE_BUILD_TYPE=$BUILD_TYPE \
+            -DCMAKE_INSTALL_PREFIX=$INSTALL_DIR \
+            -DSDL_SHARED=ON \
+            -DSDL_STATIC=ON
+
+          cmake --build build/SDL3 --config $BUILD_TYPE --parallel
+          cmake --install build/SDL3 --config $BUILD_TYPE
+
+      - name: Prepare package
+        shell: bash
+        run: |
+          mkdir -p package/include
+          mkdir -p package/lib
+          mkdir -p package/bin
+
+          # include
+          cp -r $INSTALL_DIR/include/* package/include/ || true
+
+          # libraries
+          find $INSTALL_DIR -type f \( \
+            -name "*.lib" -o \
+            -name "*.a" -o \
+            -name "*.so" -o \
+            -name "*.dylib" \) \
+            -exec cp {} package/lib/ \;
+
+          # dll
+          find $INSTALL_DIR -type f -name "*.dll" \
+            -exec cp {} package/bin/ \;
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: dependencies-${{ runner.os }}
+          path: package
