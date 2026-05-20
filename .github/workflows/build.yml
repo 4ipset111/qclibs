@@ -16,11 +16,14 @@ jobs:
           - ubuntu-latest
           - windows-latest
           - macos-latest
+        build_type:
+          - Debug
+          - Release
 
     runs-on: ${{ matrix.os }}
 
     env:
-      BUILD_TYPE: Release
+      BUILD_TYPE: ${{ matrix.build_type }}
       INSTALL_DIR: ${{ github.workspace }}/deps-install
 
       ASSIMP_VERSION: v6.0.5
@@ -132,7 +135,6 @@ jobs:
         run: |
           mkdir -p package/include
           mkdir -p package/lib
-          mkdir -p package/bin
 
           if [ -d "$INSTALL_DIR/include" ]; then
             cp -r "$INSTALL_DIR/include/." package/include/
@@ -140,16 +142,20 @@ jobs:
 
           find "$INSTALL_DIR" -type f \( \
             -name "*.lib" -o \
-            -name "*.a" -o \
-            -name "*.so" -o \
+            -name "*.a"   -o \
+            -name "*.so"  -o \
+            -name "*.so.*" -o \
             -name "*.dylib" \) \
-            -exec cp {} package/lib/ \;
+            -exec cp -P {} package/lib/ \;
 
-          find "$INSTALL_DIR" -type f -name "*.dll" \
-            -exec cp {} package/bin/ \;
+          if [ "$RUNNER_OS" = "Windows" ]; then
+            mkdir -p package/bin
+            find "$INSTALL_DIR" -type f -name "*.dll" \
+              -exec cp {} package/bin/ \;
+          fi
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: dependencies-${{ runner.os }}
+          name: dependencies-${{ runner.os }}-${{ matrix.build_type }}
           path: package
