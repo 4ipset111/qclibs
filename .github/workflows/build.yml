@@ -25,7 +25,7 @@ jobs:
 
       ASSIMP_VERSION: v6.0.5
       FREETYPE_VERSION: VER-2-14-3
-      GLEW_VERSION: glew-2.3.1
+      GLEW_VERSION: glew-2.2.0
       SDL3_VERSION: release-3.4.8
 
     steps:
