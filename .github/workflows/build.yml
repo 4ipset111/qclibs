@@ -112,15 +112,24 @@ jobs:
             --recursive \
             https://github.com/nigels-com/glew.git
 
+      - name: Generate GLEW sources
+        shell: bash
+        run: |
+          cd glew/auto
+
+          make
+
       - name: Build GLEW
         shell: bash
         run: |
           cmake -S glew/build/cmake -B build/glew \
             -DCMAKE_BUILD_TYPE=$BUILD_TYPE \
             -DCMAKE_INSTALL_PREFIX=$INSTALL_DIR \
-            -DBUILD_SHARED_LIBS=ON
+            -DBUILD_SHARED_LIBS=ON \
+            -DGLEW_BUILD_SHARED=ON \
+            -DGLEW_BUILD_STATIC=ON
 
-          cmake --build build/glew --config $BUILD_TYPE --parallel
+          cmake --build build/glew --config $BUILD_TYPE --parallel 2
           cmake --install build/glew --config $BUILD_TYPE
 
       - name: Clone SDL3
