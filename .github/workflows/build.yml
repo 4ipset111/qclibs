@@ -75,11 +75,13 @@ jobs:
           msystem: MINGW64
           update: true
           install: mingw-w64-x86_64-toolchain mingw-w64-x86_64-cmake mingw-w64-x86_64-ninja mingw-w64-x86_64-binutils
+          msys2-path-type: inherit
 
       - name: Publish MinGW path
         if: runner.os == 'Windows' && matrix.toolchain == 'mingw'
         run: |
           echo "PATH=/c/msys64/mingw64/bin:$PATH" >> $GITHUB_ENV
+          echo "CMAKE_PROGRAM_PATH=/c/msys64/mingw64/bin" >> $GITHUB_ENV
 
       - name: Create directories
         shell: bash
@@ -110,11 +112,12 @@ jobs:
           )
 
           if [ "$RUNNER_OS" = "Windows" ] && [ "${{ matrix.toolchain }}" = "mingw" ]; then
-            cmake_args+=(
+            export PATH="/c/msys64/mingw64/bin:$PATH"
+            cmake_args=(
               -G Ninja
-              -DCMAKE_C_COMPILER=x86_64-w64-mingw32-gcc
-              -DCMAKE_CXX_COMPILER=x86_64-w64-mingw32-g++
-              -DCMAKE_RC_COMPILER=/c/msys64/mingw64/bin/x86_64-w64-mingw32-windres
+              -DCMAKE_C_COMPILER=/c/msys64/mingw64/bin/x86_64-w64-mingw32-gcc.exe
+              -DCMAKE_CXX_COMPILER=/c/msys64/mingw64/bin/x86_64-w64-mingw32-g++.exe
+              -DCMAKE_RC_COMPILER=/c/msys64/mingw64/bin/x86_64-w64-mingw32-windres.exe
             )
           fi
 
@@ -142,11 +145,12 @@ jobs:
           )
 
           if [ "$RUNNER_OS" = "Windows" ] && [ "${{ matrix.toolchain }}" = "mingw" ]; then
-            cmake_args+=(
+            export PATH="/c/msys64/mingw64/bin:$PATH"
+            cmake_args=(
               -G Ninja
-              -DCMAKE_C_COMPILER=x86_64-w64-mingw32-gcc
-              -DCMAKE_CXX_COMPILER=x86_64-w64-mingw32-g++
-              -DCMAKE_RC_COMPILER=x86_64-w64-mingw32-windres
+              -DCMAKE_C_COMPILER=/c/msys64/mingw64/bin/x86_64-w64-mingw32-gcc.exe
+              -DCMAKE_CXX_COMPILER=/c/msys64/mingw64/bin/x86_64-w64-mingw32-g++.exe
+              -DCMAKE_RC_COMPILER=/c/msys64/mingw64/bin/x86_64-w64-mingw32-windres.exe
             )
           fi
 
@@ -174,11 +178,12 @@ jobs:
           )
 
           if [ "$RUNNER_OS" = "Windows" ] && [ "${{ matrix.toolchain }}" = "mingw" ]; then
-            cmake_args+=(
+            export PATH="/c/msys64/mingw64/bin:$PATH"
+            cmake_args=(
               -G Ninja
-              -DCMAKE_C_COMPILER=x86_64-w64-mingw32-gcc
-              -DCMAKE_CXX_COMPILER=x86_64-w64-mingw32-g++
-              -DCMAKE_RC_COMPILER=x86_64-w64-mingw32-windres
+              -DCMAKE_C_COMPILER=/c/msys64/mingw64/bin/x86_64-w64-mingw32-gcc.exe
+              -DCMAKE_CXX_COMPILER=/c/msys64/mingw64/bin/x86_64-w64-mingw32-g++.exe
+              -DCMAKE_RC_COMPILER=/c/msys64/mingw64/bin/x86_64-w64-mingw32-windres.exe
             )
           fi
 
