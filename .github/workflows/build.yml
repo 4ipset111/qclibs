@@ -80,7 +80,7 @@ jobs:
       - name: Publish MinGW path
         if: runner.os == 'Windows' && matrix.toolchain == 'mingw'
         run: |
-          echo "PATH=/c/msys64/mingw64/bin:$PATH" >> $GITHUB_ENV
+          echo "PATH=C:\\msys64\\mingw64\\bin;$PATH" >> $GITHUB_ENV
           echo "CMAKE_PROGRAM_PATH=/c/msys64/mingw64/bin" >> $GITHUB_ENV
 
       - name: Create directories
@@ -101,7 +101,7 @@ jobs:
       - name: Build assimp
         shell: bash
         run: |
-          export PATH="/c/msys64/mingw64/bin:$PATH"
+          export PATH="/c/msys64/mingw64/bin:C:/msys64/mingw64/bin:$PATH"
           export CC=x86_64-w64-mingw32-gcc.exe
           export CXX=x86_64-w64-mingw32-g++.exe
           cmake_args=(
@@ -138,7 +138,7 @@ jobs:
       - name: Build freetype
         shell: bash
         run: |
-          export PATH="/c/msys64/mingw64/bin:$PATH"
+          export PATH="/c/msys64/mingw64/bin:C:/msys64/mingw64/bin:$PATH"
           export CC=x86_64-w64-mingw32-gcc.exe
           export CXX=x86_64-w64-mingw32-g++.exe
           cmake_args=(
@@ -173,7 +173,7 @@ jobs:
       - name: Build SDL3
         shell: bash
         run: |
-          export PATH="/c/msys64/mingw64/bin:$PATH"
+          export PATH="/c/msys64/mingw64/bin:C:/msys64/mingw64/bin:$PATH"
           export CC=x86_64-w64-mingw32-gcc.exe
           export CXX=x86_64-w64-mingw32-g++.exe
           cmake_args=(
