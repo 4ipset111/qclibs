@@ -74,7 +74,12 @@ jobs:
         with:
           msystem: MINGW64
           update: true
-          install: mingw-w64-x86_64-toolchain mingw-w64-x86_64-cmake mingw-w64-x86_64-ninja
+          install: mingw-w64-x86_64-toolchain mingw-w64-x86_64-cmake mingw-w64-x86_64-ninja mingw-w64-x86_64-binutils
+
+      - name: Publish MinGW path
+        if: runner.os == 'Windows' && matrix.toolchain == 'mingw'
+        run: |
+          echo "PATH=/c/msys64/mingw64/bin:$PATH" >> $GITHUB_ENV
 
       - name: Create directories
         shell: bash
@@ -109,7 +114,7 @@ jobs:
               -G Ninja
               -DCMAKE_C_COMPILER=x86_64-w64-mingw32-gcc
               -DCMAKE_CXX_COMPILER=x86_64-w64-mingw32-g++
-              -DCMAKE_RC_COMPILER=x86_64-w64-mingw32-windres
+              -DCMAKE_RC_COMPILER=/c/msys64/mingw64/bin/x86_64-w64-mingw32-windres
             )
           fi
 
