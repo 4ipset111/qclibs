@@ -101,9 +101,9 @@ jobs:
       - name: Build assimp
         shell: bash
         run: |
-          export PATH="/c/msys64/mingw64/bin:C:/msys64/mingw64/bin:$PATH"
-          export CC=C:/msys64/mingw64/bin/x86_64-w64-mingw32-gcc.exe
-          export CXX=C:/msys64/mingw64/bin/x86_64-w64-mingw32-g++.exe
+          export PATH="/c/msys64/mingw64/bin:$PATH"
+          export CC=/c/msys64/mingw64/bin/x86_64-w64-mingw32-gcc.exe
+          export CXX=/c/msys64/mingw64/bin/x86_64-w64-mingw32-g++.exe
           cmake_args=(
             -S assimp -B build/assimp
             -DCMAKE_BUILD_TYPE="$BUILD_TYPE"
@@ -125,9 +125,9 @@ jobs:
               -DASSIMP_BUILD_TESTS=OFF \
               -DASSIMP_BUILD_ASSIMP_TOOLS=OFF \
               -DBUILD_SHARED_LIBS=ON \
-              -DCMAKE_C_COMPILER=C:/msys64/mingw64/bin/x86_64-w64-mingw32-gcc.exe \
-              -DCMAKE_CXX_COMPILER=C:/msys64/mingw64/bin/x86_64-w64-mingw32-g++.exe \
-              -DCMAKE_RC_COMPILER=C:/msys64/mingw64/bin/x86_64-w64-mingw32-windres.exe \
+              -DCMAKE_C_COMPILER=/c/msys64/mingw64/bin/x86_64-w64-mingw32-gcc.exe \
+              -DCMAKE_CXX_COMPILER=/c/msys64/mingw64/bin/x86_64-w64-mingw32-g++.exe \
+              -DCMAKE_RC_COMPILER=/c/msys64/mingw64/bin/x86_64-w64-mingw32-windres.exe \
               -DCMAKE_C_COMPILER_LAUNCHER= \
               -DCMAKE_CXX_COMPILER_LAUNCHER= \
               -DCMAKE_RC_COMPILER_LAUNCHER=
@@ -155,9 +155,9 @@ jobs:
       - name: Build freetype
         shell: bash
         run: |
-          export PATH="/c/msys64/mingw64/bin:C:/msys64/mingw64/bin:$PATH"
-          export CC=C:/msys64/mingw64/bin/x86_64-w64-mingw32-gcc.exe
-          export CXX=C:/msys64/mingw64/bin/x86_64-w64-mingw32-g++.exe
+          export PATH="/c/msys64/mingw64/bin:$PATH"
+          export CC=/c/msys64/mingw64/bin/x86_64-w64-mingw32-gcc.exe
+          export CXX=/c/msys64/mingw64/bin/x86_64-w64-mingw32-g++.exe
           cmake_args=(
             -S freetype -B build/freetype
             -DCMAKE_BUILD_TYPE="$BUILD_TYPE"
@@ -175,9 +175,9 @@ jobs:
               -DCMAKE_INSTALL_PREFIX="$INSTALL_DIR" \
               -DCMAKE_INSTALL_LIBDIR=lib \
               -DBUILD_SHARED_LIBS=ON \
-              -DCMAKE_C_COMPILER=C:/msys64/mingw64/bin/x86_64-w64-mingw32-gcc.exe \
-              -DCMAKE_CXX_COMPILER=C:/msys64/mingw64/bin/x86_64-w64-mingw32-g++.exe \
-              -DCMAKE_RC_COMPILER=C:/msys64/mingw64/bin/x86_64-w64-mingw32-windres.exe \
+              -DCMAKE_C_COMPILER=/c/msys64/mingw64/bin/x86_64-w64-mingw32-gcc.exe \
+              -DCMAKE_CXX_COMPILER=/c/msys64/mingw64/bin/x86_64-w64-mingw32-g++.exe \
+              -DCMAKE_RC_COMPILER=/c/msys64/mingw64/bin/x86_64-w64-mingw32-windres.exe \
               -DCMAKE_C_COMPILER_LAUNCHER= \
               -DCMAKE_CXX_COMPILER_LAUNCHER= \
               -DCMAKE_RC_COMPILER_LAUNCHER=
@@ -203,9 +203,9 @@ jobs:
       - name: Build SDL3
         shell: bash
         run: |
-          export PATH="/c/msys64/mingw64/bin:C:/msys64/mingw64/bin:$PATH"
-          export CC=C:/msys64/mingw64/bin/x86_64-w64-mingw32-gcc.exe
-          export CXX=C:/msys64/mingw64/bin/x86_64-w64-mingw32-g++.exe
+          export PATH="/c/msys64/mingw64/bin:$PATH"
+          export CC=/c/msys64/mingw64/bin/x86_64-w64-mingw32-gcc.exe
+          export CXX=/c/msys64/mingw64/bin/x86_64-w64-mingw32-g++.exe
           cmake_args=(
             -S SDL3 -B build/SDL3
             -DCMAKE_BUILD_TYPE="$BUILD_TYPE"
@@ -223,9 +223,9 @@ jobs:
               -DCMAKE_INSTALL_PREFIX="$INSTALL_DIR" \
               -DSDL_SHARED=ON \
               -DSDL_STATIC=ON \
-              -DCMAKE_C_COMPILER=C:/msys64/mingw64/bin/x86_64-w64-mingw32-gcc.exe \
-              -DCMAKE_CXX_COMPILER=C:/msys64/mingw64/bin/x86_64-w64-mingw32-g++.exe \
-              -DCMAKE_RC_COMPILER=C:/msys64/mingw64/bin/x86_64-w64-mingw32-windres.exe \
+              -DCMAKE_C_COMPILER=/c/msys64/mingw64/bin/x86_64-w64-mingw32-gcc.exe \
+              -DCMAKE_CXX_COMPILER=/c/msys64/mingw64/bin/x86_64-w64-mingw32-g++.exe \
+              -DCMAKE_RC_COMPILER=/c/msys64/mingw64/bin/x86_64-w64-mingw32-windres.exe \
               -DCMAKE_C_COMPILER_LAUNCHER= \
               -DCMAKE_CXX_COMPILER_LAUNCHER= \
               -DCMAKE_RC_COMPILER_LAUNCHER=
