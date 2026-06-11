@@ -101,6 +101,9 @@ jobs:
       - name: Build assimp
         shell: bash
         run: |
+          export PATH="/c/msys64/mingw64/bin:$PATH"
+          export CC=x86_64-w64-mingw32-gcc
+          export CXX=x86_64-w64-mingw32-g++
           cmake_args=(
             -S assimp -B build/assimp
             -DCMAKE_BUILD_TYPE="$BUILD_TYPE"
@@ -112,12 +115,11 @@ jobs:
           )
 
           if [ "$RUNNER_OS" = "Windows" ] && [ "${{ matrix.toolchain }}" = "mingw" ]; then
-            export PATH="/c/msys64/mingw64/bin:$PATH"
             cmake_args+=(
               -G Ninja
-              -DCMAKE_C_COMPILER=/c/msys64/mingw64/bin/x86_64-w64-mingw32-gcc.exe
-              -DCMAKE_CXX_COMPILER=/c/msys64/mingw64/bin/x86_64-w64-mingw32-g++.exe
-              -DCMAKE_RC_COMPILER=/c/msys64/mingw64/bin/x86_64-w64-mingw32-windres.exe
+              -DCMAKE_C_COMPILER=x86_64-w64-mingw32-gcc
+              -DCMAKE_CXX_COMPILER=x86_64-w64-mingw32-g++
+              -DCMAKE_RC_COMPILER=x86_64-w64-mingw32-windres
             )
           fi
 
@@ -136,6 +138,9 @@ jobs:
       - name: Build freetype
         shell: bash
         run: |
+          export PATH="/c/msys64/mingw64/bin:$PATH"
+          export CC=x86_64-w64-mingw32-gcc
+          export CXX=x86_64-w64-mingw32-g++
           cmake_args=(
             -S freetype -B build/freetype
             -DCMAKE_BUILD_TYPE="$BUILD_TYPE"
@@ -145,12 +150,11 @@ jobs:
           )
 
           if [ "$RUNNER_OS" = "Windows" ] && [ "${{ matrix.toolchain }}" = "mingw" ]; then
-            export PATH="/c/msys64/mingw64/bin:$PATH"
             cmake_args+=(
               -G Ninja
-              -DCMAKE_C_COMPILER=/c/msys64/mingw64/bin/x86_64-w64-mingw32-gcc.exe
-              -DCMAKE_CXX_COMPILER=/c/msys64/mingw64/bin/x86_64-w64-mingw32-g++.exe
-              -DCMAKE_RC_COMPILER=/c/msys64/mingw64/bin/x86_64-w64-mingw32-windres.exe
+              -DCMAKE_C_COMPILER=x86_64-w64-mingw32-gcc
+              -DCMAKE_CXX_COMPILER=x86_64-w64-mingw32-g++
+              -DCMAKE_RC_COMPILER=x86_64-w64-mingw32-windres
             )
           fi
 
@@ -169,6 +173,9 @@ jobs:
       - name: Build SDL3
         shell: bash
         run: |
+          export PATH="/c/msys64/mingw64/bin:$PATH"
+          export CC=x86_64-w64-mingw32-gcc
+          export CXX=x86_64-w64-mingw32-g++
           cmake_args=(
             -S SDL3 -B build/SDL3
             -DCMAKE_BUILD_TYPE="$BUILD_TYPE"
@@ -178,12 +185,11 @@ jobs:
           )
 
           if [ "$RUNNER_OS" = "Windows" ] && [ "${{ matrix.toolchain }}" = "mingw" ]; then
-            export PATH="/c/msys64/mingw64/bin:$PATH"
             cmake_args+=(
               -G Ninja
-              -DCMAKE_C_COMPILER=/c/msys64/mingw64/bin/x86_64-w64-mingw32-gcc.exe
-              -DCMAKE_CXX_COMPILER=/c/msys64/mingw64/bin/x86_64-w64-mingw32-g++.exe
-              -DCMAKE_RC_COMPILER=/c/msys64/mingw64/bin/x86_64-w64-mingw32-windres.exe
+              -DCMAKE_C_COMPILER=x86_64-w64-mingw32-gcc
+              -DCMAKE_CXX_COMPILER=x86_64-w64-mingw32-g++
+              -DCMAKE_RC_COMPILER=x86_64-w64-mingw32-windres
             )
           fi
 
