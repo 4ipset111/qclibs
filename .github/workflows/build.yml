@@ -116,18 +116,31 @@ jobs:
 
           if [ "$RUNNER_OS" = "Windows" ] && [ "${{ matrix.toolchain }}" = "mingw" ]; then
             export CCACHE_DISABLE=1
-            cmake_args=(
-              -G Ninja
-              -DCMAKE_C_COMPILER=C:/msys64/mingw64/bin/x86_64-w64-mingw32-gcc.exe
-              -DCMAKE_CXX_COMPILER=C:/msys64/mingw64/bin/x86_64-w64-mingw32-g++.exe
-              -DCMAKE_RC_COMPILER=C:/msys64/mingw64/bin/x86_64-w64-mingw32-windres.exe
-              -DCMAKE_C_COMPILER_LAUNCHER=
-              -DCMAKE_CXX_COMPILER_LAUNCHER=
+            cmake \
+              -S assimp -B build/assimp \
+              -G Ninja \
+              -DCMAKE_BUILD_TYPE="$BUILD_TYPE" \
+              -DCMAKE_INSTALL_PREFIX="$INSTALL_DIR" \
+              -DCMAKE_INSTALL_LIBDIR=lib \
+              -DASSIMP_BUILD_TESTS=OFF \
+              -DASSIMP_BUILD_ASSIMP_TOOLS=OFF \
+              -DBUILD_SHARED_LIBS=ON \
+              -DCMAKE_C_COMPILER=C:/msys64/mingw64/bin/x86_64-w64-mingw32-gcc.exe \
+              -DCMAKE_CXX_COMPILER=C:/msys64/mingw64/bin/x86_64-w64-mingw32-g++.exe \
+              -DCMAKE_RC_COMPILER=C:/msys64/mingw64/bin/x86_64-w64-mingw32-windres.exe \
+              -DCMAKE_C_COMPILER_LAUNCHER= \
+              -DCMAKE_CXX_COMPILER_LAUNCHER= \
               -DCMAKE_RC_COMPILER_LAUNCHER=
-            )
+          else
+            cmake \
+              -S assimp -B build/assimp \
+              -DCMAKE_BUILD_TYPE="$BUILD_TYPE" \
+              -DCMAKE_INSTALL_PREFIX="$INSTALL_DIR" \
+              -DCMAKE_INSTALL_LIBDIR=lib \
+              -DASSIMP_BUILD_TESTS=OFF \
+              -DASSIMP_BUILD_ASSIMP_TOOLS=OFF \
+              -DBUILD_SHARED_LIBS=ON
           fi
-
-          cmake "${cmake_args[@]}"
           cmake --build build/assimp --config "$BUILD_TYPE" --parallel 2
           cmake --install build/assimp --config "$BUILD_TYPE"
 
@@ -154,15 +167,28 @@ jobs:
           )
 
           if [ "$RUNNER_OS" = "Windows" ] && [ "${{ matrix.toolchain }}" = "mingw" ]; then
-            cmake_args+=(
-              -G Ninja
-              -DCMAKE_C_COMPILER=C:/msys64/mingw64/bin/x86_64-w64-mingw32-gcc.exe
-              -DCMAKE_CXX_COMPILER=C:/msys64/mingw64/bin/x86_64-w64-mingw32-g++.exe
-              -DCMAKE_RC_COMPILER=C:/msys64/mingw64/bin/x86_64-w64-mingw32-windres.exe
-            )
+            export CCACHE_DISABLE=1
+            cmake \
+              -S freetype -B build/freetype \
+              -G Ninja \
+              -DCMAKE_BUILD_TYPE="$BUILD_TYPE" \
+              -DCMAKE_INSTALL_PREFIX="$INSTALL_DIR" \
+              -DCMAKE_INSTALL_LIBDIR=lib \
+              -DBUILD_SHARED_LIBS=ON \
+              -DCMAKE_C_COMPILER=C:/msys64/mingw64/bin/x86_64-w64-mingw32-gcc.exe \
+              -DCMAKE_CXX_COMPILER=C:/msys64/mingw64/bin/x86_64-w64-mingw32-g++.exe \
+              -DCMAKE_RC_COMPILER=C:/msys64/mingw64/bin/x86_64-w64-mingw32-windres.exe \
+              -DCMAKE_C_COMPILER_LAUNCHER= \
+              -DCMAKE_CXX_COMPILER_LAUNCHER= \
+              -DCMAKE_RC_COMPILER_LAUNCHER=
+          else
+            cmake \
+              -S freetype -B build/freetype \
+              -DCMAKE_BUILD_TYPE="$BUILD_TYPE" \
+              -DCMAKE_INSTALL_PREFIX="$INSTALL_DIR" \
+              -DCMAKE_INSTALL_LIBDIR=lib \
+              -DBUILD_SHARED_LIBS=ON
           fi
-
-          cmake "${cmake_args[@]}"
           cmake --build build/freetype --config "$BUILD_TYPE" --parallel
           cmake --install build/freetype --config "$BUILD_TYPE"
 
@@ -189,15 +215,28 @@ jobs:
           )
 
           if [ "$RUNNER_OS" = "Windows" ] && [ "${{ matrix.toolchain }}" = "mingw" ]; then
-            cmake_args+=(
-              -G Ninja
-              -DCMAKE_C_COMPILER=C:/msys64/mingw64/bin/x86_64-w64-mingw32-gcc.exe
-              -DCMAKE_CXX_COMPILER=C:/msys64/mingw64/bin/x86_64-w64-mingw32-g++.exe
-              -DCMAKE_RC_COMPILER=C:/msys64/mingw64/bin/x86_64-w64-mingw32-windres.exe
-            )
+            export CCACHE_DISABLE=1
+            cmake \
+              -S SDL3 -B build/SDL3 \
+              -G Ninja \
+              -DCMAKE_BUILD_TYPE="$BUILD_TYPE" \
+              -DCMAKE_INSTALL_PREFIX="$INSTALL_DIR" \
+              -DSDL_SHARED=ON \
+              -DSDL_STATIC=ON \
+              -DCMAKE_C_COMPILER=C:/msys64/mingw64/bin/x86_64-w64-mingw32-gcc.exe \
+              -DCMAKE_CXX_COMPILER=C:/msys64/mingw64/bin/x86_64-w64-mingw32-g++.exe \
+              -DCMAKE_RC_COMPILER=C:/msys64/mingw64/bin/x86_64-w64-mingw32-windres.exe \
+              -DCMAKE_C_COMPILER_LAUNCHER= \
+              -DCMAKE_CXX_COMPILER_LAUNCHER= \
+              -DCMAKE_RC_COMPILER_LAUNCHER=
+          else
+            cmake \
+              -S SDL3 -B build/SDL3 \
+              -DCMAKE_BUILD_TYPE="$BUILD_TYPE" \
+              -DCMAKE_INSTALL_PREFIX="$INSTALL_DIR" \
+              -DSDL_SHARED=ON \
+              -DSDL_STATIC=ON
           fi
-
-          cmake "${cmake_args[@]}"
           cmake --build build/SDL3 --config "$BUILD_TYPE" --parallel
           cmake --install build/SDL3 --config "$BUILD_TYPE"
 
