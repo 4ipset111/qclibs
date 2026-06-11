@@ -115,11 +115,15 @@ jobs:
           )
 
           if [ "$RUNNER_OS" = "Windows" ] && [ "${{ matrix.toolchain }}" = "mingw" ]; then
-            cmake_args+=(
+            export CCACHE_DISABLE=1
+            cmake_args=(
               -G Ninja
               -DCMAKE_C_COMPILER=C:/msys64/mingw64/bin/x86_64-w64-mingw32-gcc.exe
               -DCMAKE_CXX_COMPILER=C:/msys64/mingw64/bin/x86_64-w64-mingw32-g++.exe
               -DCMAKE_RC_COMPILER=C:/msys64/mingw64/bin/x86_64-w64-mingw32-windres.exe
+              -DCMAKE_C_COMPILER_LAUNCHER=
+              -DCMAKE_CXX_COMPILER_LAUNCHER=
+              -DCMAKE_RC_COMPILER_LAUNCHER=
             )
           fi
 
