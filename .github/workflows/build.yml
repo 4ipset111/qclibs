@@ -101,15 +101,7 @@ jobs:
       - name: Build assimp
         shell: bash
         run: |
-          export PATH="/c/msys64/mingw64/bin:$PATH"
-          PATH=${PATH//C:\\Strawberry\\c\\bin/}
-          PATH=${PATH//C:\/Strawberry\/c\/bin/}
-          PATH=${PATH//\/c\/Strawberry\/c\/bin/}
-          PATH=${PATH//;;/;}
-          PATH=${PATH//::/:}
-          PATH=${PATH#;}
-          PATH=${PATH%;}
-          export PATH
+          export PATH="/c/msys64/mingw64/bin:/usr/bin:/bin"
           export CC=/c/msys64/mingw64/bin/x86_64-w64-mingw32-gcc.exe
           export CXX=/c/msys64/mingw64/bin/x86_64-w64-mingw32-g++.exe
           cmake_args=(
@@ -163,15 +155,7 @@ jobs:
       - name: Build freetype
         shell: bash
         run: |
-          export PATH="/c/msys64/mingw64/bin:$PATH"
-          PATH=${PATH//C:\\Strawberry\\c\\bin/}
-          PATH=${PATH//C:\/Strawberry\/c\/bin/}
-          PATH=${PATH//\/c\/Strawberry\/c\/bin/}
-          PATH=${PATH//;;/;}
-          PATH=${PATH//::/:}
-          PATH=${PATH#;}
-          PATH=${PATH%;}
-          export PATH
+          export PATH="/c/msys64/mingw64/bin:/usr/bin:/bin"
           export CC=/c/msys64/mingw64/bin/x86_64-w64-mingw32-gcc.exe
           export CXX=/c/msys64/mingw64/bin/x86_64-w64-mingw32-g++.exe
           cmake_args=(
@@ -219,15 +203,7 @@ jobs:
       - name: Build SDL3
         shell: bash
         run: |
-          export PATH="/c/msys64/mingw64/bin:$PATH"
-          PATH=${PATH//C:\\Strawberry\\c\\bin/}
-          PATH=${PATH//C:\/Strawberry\/c\/bin/}
-          PATH=${PATH//\/c\/Strawberry\/c\/bin/}
-          PATH=${PATH//;;/;}
-          PATH=${PATH//::/:}
-          PATH=${PATH#;}
-          PATH=${PATH%;}
-          export PATH
+          export PATH="/c/msys64/mingw64/bin:/usr/bin:/bin"
           export CC=/c/msys64/mingw64/bin/x86_64-w64-mingw32-gcc.exe
           export CXX=/c/msys64/mingw64/bin/x86_64-w64-mingw32-g++.exe
           cmake_args=(
