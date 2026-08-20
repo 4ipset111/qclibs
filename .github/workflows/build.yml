@@ -108,7 +108,7 @@ jobs:
             -DCMAKE_INSTALL_LIBDIR=lib \
             -DBUILD_SHARED_LIBS=ON
 
-          cmake --build build/freetype --config $BUILD_TYPE --parallel
+          cmake --build build/freetype --config $BUILD_TYPE --parallel 2
           cmake --install build/freetype --config $BUILD_TYPE
 
       - name: Clone SDL3
@@ -128,7 +128,7 @@ jobs:
             -DSDL_SHARED=ON \
             -DSDL_STATIC=ON
 
-          cmake --build build/SDL3 --config $BUILD_TYPE --parallel
+          cmake --build build/SDL3 --config $BUILD_TYPE --parallel 2
           cmake --install build/SDL3 --config $BUILD_TYPE
 
       - name: Clone shaderc
@@ -150,9 +150,12 @@ jobs:
             -DSHADERC_SKIP_TESTS=ON \
             -DSHADERC_SKIP_EXAMPLES=ON \
             -DSHADERC_SKIP_COPYRIGHT_CHECK=ON \
-            -DBUILD_SHARED_LIBS=ON
+            -DBUILD_SHARED_LIBS=ON \
+            -DSHADERC_ENABLE_SHARED_CRT=ON \
+            -DSPIRV_SKIP_TESTS=ON \
+            -DSPIRV_TOOLS_INSTALL_HANDLER=OFF
 
-          cmake --build build/shaderc --config $BUILD_TYPE --parallel
+          cmake --build build/shaderc --config $BUILD_TYPE --parallel 2
           cmake --install build/shaderc --config $BUILD_TYPE
 
       - name: Prepare package
