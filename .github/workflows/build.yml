@@ -143,6 +143,11 @@ jobs:
       - name: Build shaderc
         shell: bash
         run: |
+          SHADERC_BUILD_SHARED=ON
+          if [ "$RUNNER_OS" = "Windows" ]; then
+            SHADERC_BUILD_SHARED=OFF
+          fi
+
           cmake -S shaderc -B build/shaderc \
             -DCMAKE_BUILD_TYPE=$BUILD_TYPE \
             -DCMAKE_INSTALL_PREFIX=$INSTALL_DIR \
@@ -150,8 +155,7 @@ jobs:
             -DSHADERC_SKIP_TESTS=ON \
             -DSHADERC_SKIP_EXAMPLES=ON \
             -DSHADERC_SKIP_COPYRIGHT_CHECK=ON \
-            -DBUILD_SHARED_LIBS=ON \
-            -DSPIRV_TOOLS_BUILD_STATIC=OFF \
+            -DBUILD_SHARED_LIBS=$SHADERC_BUILD_SHARED \
             -DSHADERC_ENABLE_SHARED_CRT=ON \
             -DSPIRV_SKIP_TESTS=ON \
             -DSPIRV_TOOLS_INSTALL_HANDLER=OFF

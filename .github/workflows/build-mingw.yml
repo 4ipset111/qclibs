@@ -126,8 +126,7 @@ jobs:
             -DSHADERC_SKIP_TESTS=ON \
             -DSHADERC_SKIP_EXAMPLES=ON \
             -DSHADERC_SKIP_COPYRIGHT_CHECK=ON \
-            -DBUILD_SHARED_LIBS=ON \
-            -DSPIRV_TOOLS_BUILD_STATIC=OFF
+            -DBUILD_SHARED_LIBS=OFF
 
           cmake --build build/shaderc --config $BUILD_TYPE --parallel
           cmake --install build/shaderc --config $BUILD_TYPE
