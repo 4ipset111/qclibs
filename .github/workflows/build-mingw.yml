@@ -141,7 +141,11 @@ jobs:
             local name="$1"
             local install_dir="$2"
             local package_dir="package/$name"
-            local lib_dir="$package_dir/lib/${BUILD_TYPE,,}/${RUNNER_OS}"
+            local build_type_lower
+            local lib_dir
+
+            build_type_lower="$(printf '%s' "$BUILD_TYPE" | tr '[:upper:]' '[:lower:]')"
+            lib_dir="$package_dir/lib/$build_type_lower/$RUNNER_OS"
 
             mkdir -p "$package_dir/include" "$lib_dir"
 
