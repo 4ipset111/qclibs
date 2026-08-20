@@ -20,7 +20,10 @@ jobs:
 
     env:
       BUILD_TYPE: ${{ matrix.build_type }}
-      INSTALL_DIR: ${{ github.workspace }}/deps-install
+      ASSIMP_INSTALL_DIR: ${{ github.workspace }}/deps-install/assimp
+      FREETYPE_INSTALL_DIR: ${{ github.workspace }}/deps-install/freetype
+      SDL3_INSTALL_DIR: ${{ github.workspace }}/deps-install/SDL3
+      SHADERC_INSTALL_DIR: ${{ github.workspace }}/deps-install/shaderc
 
       ASSIMP_VERSION: v6.0.5
       FREETYPE_VERSION: VER-2-14-3
@@ -39,7 +42,7 @@ jobs:
         shell: bash
         run: |
           mkdir -p build
-          mkdir -p $INSTALL_DIR
+          mkdir -p deps-install
 
       - name: Clone assimp
         shell: bash
@@ -55,7 +58,7 @@ jobs:
           cmake -S assimp -B build/assimp \
             -G "MinGW Makefiles" \
             -DCMAKE_BUILD_TYPE=$BUILD_TYPE \
-            -DCMAKE_INSTALL_PREFIX=$INSTALL_DIR \
+            -DCMAKE_INSTALL_PREFIX=$ASSIMP_INSTALL_DIR \
             -DCMAKE_INSTALL_LIBDIR=lib \
             -DASSIMP_BUILD_TESTS=OFF \
             -DASSIMP_BUILD_ASSIMP_TOOLS=OFF \
@@ -78,7 +81,7 @@ jobs:
           cmake -S freetype -B build/freetype \
             -G "MinGW Makefiles" \
             -DCMAKE_BUILD_TYPE=$BUILD_TYPE \
-            -DCMAKE_INSTALL_PREFIX=$INSTALL_DIR \
+            -DCMAKE_INSTALL_PREFIX=$FREETYPE_INSTALL_DIR \
             -DCMAKE_INSTALL_LIBDIR=lib \
             -DBUILD_SHARED_LIBS=ON
 
@@ -99,7 +102,7 @@ jobs:
           cmake -S SDL3 -B build/SDL3 \
             -G "MinGW Makefiles" \
             -DCMAKE_BUILD_TYPE=$BUILD_TYPE \
-            -DCMAKE_INSTALL_PREFIX=$INSTALL_DIR \
+            -DCMAKE_INSTALL_PREFIX=$SDL3_INSTALL_DIR \
             -DSDL_SHARED=ON \
             -DSDL_STATIC=ON
 
@@ -121,40 +124,45 @@ jobs:
           cmake -S shaderc -B build/shaderc \
             -G "MinGW Makefiles" \
             -DCMAKE_BUILD_TYPE=$BUILD_TYPE \
-            -DCMAKE_INSTALL_PREFIX=$INSTALL_DIR \
+            -DCMAKE_INSTALL_PREFIX=$SHADERC_INSTALL_DIR \
             -DCMAKE_INSTALL_LIBDIR=lib \
             -DSHADERC_SKIP_TESTS=ON \
             -DSHADERC_SKIP_EXAMPLES=ON \
             -DSHADERC_SKIP_COPYRIGHT_CHECK=ON \
             -DBUILD_SHARED_LIBS=OFF
 
-          cmake --build build/shaderc --config $BUILD_TYPE \
-            --target shaderc shaderc_combined glslc glslc_exe \
-            --parallel
+          cmake --build build/shaderc --config $BUILD_TYPE --parallel
           cmake --install build/shaderc --config $BUILD_TYPE
 
       - name: Prepare package
         shell: bash
         run: |
-          mkdir -p package/include
-          mkdir -p package/lib
-          mkdir -p package/bin
+          package_library() {
+            local name="$1"
+            local install_dir="$2"
+            local package_dir="package/$name"
+            local lib_dir="$package_dir/lib/${BUILD_TYPE,,}/${RUNNER_OS}"
 
-          if [ -d "$INSTALL_DIR/include" ]; then
-            cp -r "$INSTALL_DIR/include/." package/include/
-          fi
+            mkdir -p "$package_dir/include" "$lib_dir"
 
-          find "$INSTALL_DIR" -type f \( \
-            -name "*.lib" -o \
-            -name "*.a"   -o \
-            -name "*.so"  -o \
-            -name "*.so.*" -o \
-            -name "*.dylib" -o \
-            -name "*.dll" \) \
-            -exec cp -P {} package/lib/ \;
+            if [ -d "$install_dir/include" ]; then
+              cp -r "$install_dir/include/." "$package_dir/include/"
+            fi
 
-          find "$INSTALL_DIR" -type f -name "*.dll" \
-            -exec cp {} package/bin/ \;
+            find "$install_dir" -type f \( \
+              -name "*.lib" -o \
+              -name "*.a"   -o \
+              -name "*.so"  -o \
+              -name "*.so.*" -o \
+              -name "*.dylib" -o \
+              -name "*.dll" \) \
+              -exec cp -P {} "$lib_dir/" \;
+          }
+
+          package_library assimp "$ASSIMP_INSTALL_DIR"
+          package_library freetype "$FREETYPE_INSTALL_DIR"
+          package_library SDL3 "$SDL3_INSTALL_DIR"
+          package_library shaderc "$SHADERC_INSTALL_DIR"
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
