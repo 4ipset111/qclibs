@@ -128,7 +128,9 @@ jobs:
             -DSHADERC_SKIP_COPYRIGHT_CHECK=ON \
             -DBUILD_SHARED_LIBS=OFF
 
-          cmake --build build/shaderc --config $BUILD_TYPE --parallel
+          cmake --build build/shaderc --config $BUILD_TYPE \
+            --target shaderc shaderc_combined glslc glslc_exe \
+            --parallel
           cmake --install build/shaderc --config $BUILD_TYPE
 
       - name: Prepare package
