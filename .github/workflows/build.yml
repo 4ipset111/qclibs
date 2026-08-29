@@ -28,11 +28,13 @@ jobs:
       FREETYPE_INSTALL_DIR: ${{ github.workspace }}/deps-install/freetype
       SDL3_INSTALL_DIR: ${{ github.workspace }}/deps-install/SDL3
       SHADERC_INSTALL_DIR: ${{ github.workspace }}/deps-install/shaderc
+      OPENAL_INSTALL_DIR: ${{ github.workspace }}/deps-install/openal
 
       ASSIMP_VERSION: v6.0.5
       FREETYPE_VERSION: VER-2-14-3
       SDL3_VERSION: release-3.4.8
       SHADERC_VERSION: main
+      OPENAL_VERSION: 1.25.2
 
     steps:
       - name: Checkout
@@ -166,6 +168,30 @@ jobs:
           cmake --build build/shaderc --config $BUILD_TYPE --parallel 2
           cmake --install build/shaderc --config $BUILD_TYPE
 
+      - name: Clone OpenAL-soft
+        shell: bash
+        run: |
+          git clone \
+            --branch $OPENAL_VERSION \
+            --recursive \
+            https://github.com/kcat/openal-soft.git
+
+      - name: Build OpenAL-soft
+        shell: bash
+        run: |
+          cmake -S openal-soft -B build/openal-soft \
+            -DCMAKE_BUILD_TYPE=$BUILD_TYPE \
+            -DCMAKE_INSTALL_PREFIX=$OPENAL_INSTALL_DIR \
+            -DCMAKE_INSTALL_LIBDIR=lib \
+            -DLIBTYPE=SHARED \
+            -DALSOFT_UTILS=OFF \
+            -DALSOFT_EXAMPLES=OFF \
+            -DALSOFT_TESTS=OFF \
+            -DALSOFT_INSTALL=ON
+
+          cmake --build build/openal-soft --config $BUILD_TYPE --parallel 2
+          cmake --install build/openal-soft --config $BUILD_TYPE
+
       - name: Prepare package
         shell: bash
         run: |
@@ -207,6 +233,7 @@ jobs:
           package_library freetype "$FREETYPE_INSTALL_DIR"
           package_library SDL3 "$SDL3_INSTALL_DIR"
           package_library shaderc "$SHADERC_INSTALL_DIR"
+          package_library openal "$OPENAL_INSTALL_DIR"
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
