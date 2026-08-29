@@ -179,21 +179,24 @@ jobs:
       - name: Build OpenAL-soft
         shell: bash
         run: |
-          EXTRA_CXX_FLAGS=""
+          EXTRA_CMAKE_ARGS=()
           if [ "$RUNNER_OS" = "macOS" ]; then
-            EXTRA_CXX_FLAGS="-Wno-error=function-effects"
+            EXTRA_CMAKE_ARGS+=(
+              -DALSOFT_BACKEND_COREAUDIO=OFF
+              -DCMAKE_PREFIX_PATH="$SDL3_INSTALL_DIR"
+            )
           fi
 
           cmake -S openal-soft -B build/openal-soft \
             -DCMAKE_BUILD_TYPE=$BUILD_TYPE \
             -DCMAKE_INSTALL_PREFIX=$OPENAL_INSTALL_DIR \
             -DCMAKE_INSTALL_LIBDIR=lib \
-            -DCMAKE_CXX_FLAGS="$EXTRA_CXX_FLAGS" \
             -DLIBTYPE=SHARED \
             -DALSOFT_UTILS=OFF \
             -DALSOFT_EXAMPLES=OFF \
             -DALSOFT_TESTS=OFF \
-            -DALSOFT_INSTALL=ON
+            -DALSOFT_INSTALL=ON \
+            "${EXTRA_CMAKE_ARGS[@]}"
 
           cmake --build build/openal-soft --config $BUILD_TYPE --parallel 2
           cmake --install build/openal-soft --config $BUILD_TYPE
