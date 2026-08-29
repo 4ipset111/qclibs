@@ -184,6 +184,8 @@ jobs:
             EXTRA_CMAKE_ARGS+=(
               -DALSOFT_BACKEND_COREAUDIO=OFF
               -DCMAKE_PREFIX_PATH="$SDL3_INSTALL_DIR"
+              -DCMAKE_SHARED_LINKER_FLAGS="-framework CoreFoundation"
+              -DCMAKE_EXE_LINKER_FLAGS="-framework CoreFoundation"
             )
           fi
 
