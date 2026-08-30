@@ -159,7 +159,6 @@ jobs:
             -DALSOFT_INSTALL=ON
 
           cmake --build build/openal-soft --config $BUILD_TYPE --parallel 1
-          cmake --install build/openal-soft --config $BUILD_TYPEallel
           cmake --install build/openal-soft --config $BUILD_TYPE
 
       - name: Prepare package
