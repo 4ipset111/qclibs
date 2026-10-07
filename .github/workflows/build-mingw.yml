@@ -180,12 +180,17 @@ jobs:
             --depth 1 \
             https://github.com/openssl/openssl.git
 
+      - name: Install full Perl for OpenSSL
+        shell: pwsh
+        run: |
+          C:\msys64\usr\bin\pacman.exe -S --noconfirm --needed perl perl-IPC-Cmd make
+
       - name: Build OpenSSL
         shell: bash
         run: |
-          export PATH="/c/Strawberry/perl/bin:$PATH"
-          perl -v | head -n 2
+          export PATH="/c/msys64/usr/bin:$PATH"
           which perl
+          perl -v | head -n 2
 
           PREFIX="$(cygpath -m "$OPENSSL_INSTALL_DIR")"
 
