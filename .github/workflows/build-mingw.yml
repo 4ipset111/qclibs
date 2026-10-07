@@ -183,6 +183,10 @@ jobs:
       - name: Build OpenSSL
         shell: bash
         run: |
+          export PATH="/c/Strawberry/perl/bin:$PATH"
+          perl -v | head -n 2
+          which perl
+
           PREFIX="$(cygpath -m "$OPENSSL_INSTALL_DIR")"
 
           OPENSSL_ARGS=(mingw64 shared no-tests --prefix="$PREFIX" --openssldir="$PREFIX/ssl" --libdir=lib)
