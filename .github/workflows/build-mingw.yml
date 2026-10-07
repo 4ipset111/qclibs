@@ -41,8 +41,15 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Setup MinGW
+        shell: pwsh
         run: |
-          choco install mingw --version=14.2.0 -y
+          for ($i = 1; $i -le 5; $i++) {
+            choco install mingw --version=14.2.0 -y
+            if ($LASTEXITCODE -eq 0) { break }
+            Write-Host "choco install failed (attempt $i of 5), retrying..."
+            Start-Sleep -Seconds (15 * $i)
+          }
+          if ($LASTEXITCODE -ne 0) { exit 1 }
 
       - name: Create directories
         shell: bash
