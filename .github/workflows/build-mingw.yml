@@ -25,12 +25,16 @@ jobs:
       SDL3_INSTALL_DIR: ${{ github.workspace }}/deps-install/SDL3
       SHADERC_INSTALL_DIR: ${{ github.workspace }}/deps-install/shaderc
       OPENAL_INSTALL_DIR: ${{ github.workspace }}/deps-install/openal
+      CURL_INSTALL_DIR: ${{ github.workspace }}/deps-install/curl
+      OPENSSL_INSTALL_DIR: ${{ github.workspace }}/deps-install/openssl
 
       ASSIMP_VERSION: v6.0.5
       FREETYPE_VERSION: VER-2-14-3
       SDL3_VERSION: release-3.4.8
       SHADERC_VERSION: main
       OPENAL_VERSION: 1.25.2
+      CURL_VERSION: curl-8_22_0
+      OPENSSL_VERSION: openssl-3.5.6
 
     steps:
       - name: Checkout
@@ -161,6 +165,63 @@ jobs:
           cmake --build build/openal-soft --config $BUILD_TYPE --parallel 1
           cmake --install build/openal-soft --config $BUILD_TYPE
 
+      - name: Clone OpenSSL
+        shell: bash
+        run: |
+          git clone \
+            --branch $OPENSSL_VERSION \
+            --depth 1 \
+            https://github.com/openssl/openssl.git
+
+      - name: Build OpenSSL
+        shell: bash
+        run: |
+          PREFIX="$(cygpath -m "$OPENSSL_INSTALL_DIR")"
+
+          OPENSSL_ARGS=(mingw64 shared no-tests --prefix="$PREFIX" --openssldir="$PREFIX/ssl" --libdir=lib)
+          if [ "$BUILD_TYPE" = "Debug" ]; then
+            OPENSSL_ARGS+=(--debug)
+          fi
+
+          cd openssl
+          perl Configure "${OPENSSL_ARGS[@]}"
+          mingw32-make -j"$(nproc)"
+          mingw32-make install_sw
+
+      - name: Clone curl
+        shell: bash
+        run: |
+          git clone \
+            --branch $CURL_VERSION \
+            --depth 1 \
+            https://github.com/curl/curl.git
+
+      - name: Build curl
+        shell: bash
+        run: |
+          cmake -S curl -B build/curl \
+            -G "MinGW Makefiles" \
+            -DCMAKE_BUILD_TYPE=$BUILD_TYPE \
+            -DCMAKE_INSTALL_PREFIX=$CURL_INSTALL_DIR \
+            -DCMAKE_INSTALL_LIBDIR=lib \
+            -DBUILD_SHARED_LIBS=ON \
+            -DBUILD_STATIC_LIBS=OFF \
+            -DBUILD_CURL_EXE=OFF \
+            -DBUILD_TESTING=OFF \
+            -DCURL_USE_LIBPSL=OFF \
+            -DCURL_USE_LIBSSH2=OFF \
+            -DUSE_LIBIDN2=OFF \
+            -DCURL_DISABLE_LDAP=ON \
+            -DCURL_BROTLI=OFF \
+            -DCURL_ZSTD=OFF \
+            -DCURL_USE_SCHANNEL=OFF \
+            -DCURL_USE_OPENSSL=ON \
+            -DOPENSSL_USE_STATIC_LIBS=OFF \
+            -DOPENSSL_ROOT_DIR="$OPENSSL_INSTALL_DIR"
+
+          cmake --build build/curl --config $BUILD_TYPE --parallel
+          cmake --install build/curl --config $BUILD_TYPE
+
       - name: Prepare package
         shell: bash
         run: |
@@ -195,6 +256,8 @@ jobs:
           package_library SDL3 "$SDL3_INSTALL_DIR"
           package_library shaderc "$SHADERC_INSTALL_DIR"
           package_library openal "$OPENAL_INSTALL_DIR"
+          package_library curl "$CURL_INSTALL_DIR"
+          package_library openssl "$OPENSSL_INSTALL_DIR"
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4

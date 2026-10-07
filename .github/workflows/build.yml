@@ -29,12 +29,16 @@ jobs:
       SDL3_INSTALL_DIR: ${{ github.workspace }}/deps-install/SDL3
       SHADERC_INSTALL_DIR: ${{ github.workspace }}/deps-install/shaderc
       OPENAL_INSTALL_DIR: ${{ github.workspace }}/deps-install/openal
+      CURL_INSTALL_DIR: ${{ github.workspace }}/deps-install/curl
+      OPENSSL_INSTALL_DIR: ${{ github.workspace }}/deps-install/openssl
 
       ASSIMP_VERSION: v6.0.5
       FREETYPE_VERSION: VER-2-14-3
       SDL3_VERSION: release-3.4.8
       SHADERC_VERSION: main
       OPENAL_VERSION: 1.25.2
+      CURL_VERSION: curl-8_22_0
+      OPENSSL_VERSION: openssl-3.5.6
 
     steps:
       - name: Checkout
@@ -62,7 +66,8 @@ jobs:
             libxkbcommon-dev \
             libasound2-dev \
             libpulse-dev \
-            libgl1-mesa-dev
+            libgl1-mesa-dev \
+            libssl-dev
 
       - name: Setup MSVC
         if: runner.os == 'Windows'
@@ -202,6 +207,89 @@ jobs:
 
           cmake --build build/openal-soft --config $BUILD_TYPE --parallel 2
           cmake --install build/openal-soft --config $BUILD_TYPE
+
+      - name: Clone OpenSSL
+        if: runner.os != 'Linux'
+        shell: bash
+        run: |
+          git clone \
+            --branch $OPENSSL_VERSION \
+            --depth 1 \
+            https://github.com/openssl/openssl.git
+
+      - name: Build OpenSSL (macOS)
+        if: runner.os == 'macOS'
+        shell: bash
+        run: |
+          OPENSSL_ARGS=(shared no-tests --prefix="$OPENSSL_INSTALL_DIR" --libdir=lib)
+          if [ "$BUILD_TYPE" = "Debug" ]; then
+            OPENSSL_ARGS+=(--debug)
+          fi
+
+          cd openssl
+          ./config "${OPENSSL_ARGS[@]}"
+          make -j"$(sysctl -n hw.ncpu)"
+          make install_sw
+
+          cd "$OPENSSL_INSTALL_DIR/lib"
+          install_name_tool -id @rpath/libcrypto.3.dylib libcrypto.3.dylib
+          install_name_tool -id @rpath/libssl.3.dylib libssl.3.dylib
+          install_name_tool -change "$OPENSSL_INSTALL_DIR/lib/libcrypto.3.dylib" @rpath/libcrypto.3.dylib libssl.3.dylib
+          codesign --force -s - libcrypto.3.dylib libssl.3.dylib
+
+      - name: Build OpenSSL (Windows)
+        if: runner.os == 'Windows'
+        shell: cmd
+        run: |
+          set "PREFIX=%OPENSSL_INSTALL_DIR:/=\%"
+          set "DBG="
+          if /I "%BUILD_TYPE%"=="Debug" set "DBG=--debug"
+
+          cd openssl || exit /b 1
+          C:\Strawberry\perl\bin\perl.exe Configure VC-WIN64A shared no-tests no-asm %DBG% --prefix="%PREFIX%" --openssldir="%PREFIX%\ssl" --libdir=lib || exit /b 1
+          nmake || exit /b 1
+          nmake install_sw || exit /b 1
+
+      - name: Clone curl
+        shell: bash
+        run: |
+          git clone \
+            --branch $CURL_VERSION \
+            --depth 1 \
+            https://github.com/curl/curl.git
+
+      - name: Build curl
+        shell: bash
+        run: |
+          TLS_ARGS=()
+          case "$RUNNER_OS" in
+            Windows|macOS)
+              TLS_ARGS+=(-DCURL_USE_SCHANNEL=OFF -DCURL_USE_OPENSSL=ON -DOPENSSL_USE_STATIC_LIBS=OFF -DOPENSSL_ROOT_DIR="$OPENSSL_INSTALL_DIR")
+              ;;
+            Linux)
+              TLS_ARGS+=(-DCURL_USE_OPENSSL=ON)
+              ;;
+          esac
+
+          cmake -S curl -B build/curl \
+            -DCMAKE_BUILD_TYPE=$BUILD_TYPE \
+            -DCMAKE_INSTALL_PREFIX=$CURL_INSTALL_DIR \
+            -DCMAKE_INSTALL_LIBDIR=lib \
+            -DBUILD_SHARED_LIBS=ON \
+            -DBUILD_STATIC_LIBS=OFF \
+            -DBUILD_CURL_EXE=OFF \
+            -DBUILD_TESTING=OFF \
+            -DCURL_USE_LIBPSL=OFF \
+            -DCURL_USE_LIBSSH2=OFF \
+            -DUSE_LIBIDN2=OFF \
+            -DCURL_DISABLE_LDAP=ON \
+            -DCURL_BROTLI=OFF \
+            -DCURL_ZSTD=OFF \
+            "${TLS_ARGS[@]}"
+
+          cmake --build build/curl --config $BUILD_TYPE --parallel 2
+          cmake --install build/curl --config $BUILD_TYPE
+
       - name: Prepare package
         shell: bash
         run: |
@@ -244,6 +332,11 @@ jobs:
           package_library SDL3 "$SDL3_INSTALL_DIR"
           package_library shaderc "$SHADERC_INSTALL_DIR"
           package_library openal "$OPENAL_INSTALL_DIR"
+          package_library curl "$CURL_INSTALL_DIR"
+
+          if [ "$RUNNER_OS" != "Linux" ]; then
+            package_library openssl "$OPENSSL_INSTALL_DIR"
+          fi
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
